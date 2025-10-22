@@ -1,1 +1,2 @@
 spring.application.name=todolist-api
+jwt.secret=your_secret_key

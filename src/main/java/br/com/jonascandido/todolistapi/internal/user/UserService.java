@@ -21,11 +21,17 @@ public class UserService {
 
         // Validate unique email
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("Failed to create user");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         
         return userRepository.save(user);
+    }
+
+    public boolean validateUser(String email, String rawPassword) {
+        return userRepository.findByEmail(email)
+                .map(user -> passwordEncoder.matches(rawPassword, user.getPassword()))
+                .orElse(false);
     }
 }

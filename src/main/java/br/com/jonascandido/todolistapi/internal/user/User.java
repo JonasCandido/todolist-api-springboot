@@ -10,13 +10,17 @@ public class User {
 
     protected User() {}
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, Boolean isAdmin) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.isAdmin = isAdmin;
     }
 
-    
+    public User(String name, String email, String password) {
+        this(name, email, password, false); // isAdmin default
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -31,7 +35,7 @@ public class User {
     private String password;
 
     @Column(name = "is_admin", nullable = false)
-    private Boolean isAdmin;
+    private Boolean isAdmin = false;
     
     @CreationTimestamp
     private Timestamp createdAt;

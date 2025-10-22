@@ -1,4 +1,4 @@
-package br.com.jonascandido.config;
+package br.com.jonascandido.todolistapi.config;
 
 import br.com.jonascandido.todolistapi.internal.todo.Todo;
 import br.com.jonascandido.todolistapi.internal.todo.TodoRepository;
@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("dev")
@@ -33,7 +34,7 @@ public class DataSeed {
                 userRepository.save(admin);
             }
 
-            // --- TODO STATUSES ---
+            // --- STATUS ---
             if (todoStatusRepository.count() == 0) {
                 TodoStatus pending = new TodoStatus("Pending");
                 TodoStatus inProgress = new TodoStatus("In Progress");
