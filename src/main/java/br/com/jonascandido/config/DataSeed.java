@@ -1,0 +1,74 @@
+package br.com.jonascandido.config;
+
+import br.com.jonascandido.todolistapi.internal.todo.Todo;
+import br.com.jonascandido.todolistapi.internal.todo.TodoRepository;
+import br.com.jonascandido.todolistapi.internal.todostatus.TodoStatus;
+import br.com.jonascandido.todolistapi.internal.todostatus.TodoStatusRepository;
+import br.com.jonascandido.todolistapi.internal.user.User;
+import br.com.jonascandido.todolistapi.internal.user.UserRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+@Profile("dev")
+public class DataSeed {
+
+    @Bean
+    CommandLineRunner init(UserRepository userRepository,
+                           TodoStatusRepository todoStatusRepository,
+                           TodoRepository todoRepository,
+                           PasswordEncoder passwordEncoder) {
+        return args -> {
+
+            // --- USERS ---
+            if (userRepository.count() == 0) {
+                User admin = new User(
+                        "Admin",
+                        "admin@mysite.com",
+                        passwordEncoder.encode("admin123"),
+                        true
+                );
+                userRepository.save(admin);
+            }
+
+            // --- TODO STATUSES ---
+            if (todoStatusRepository.count() == 0) {
+                TodoStatus pending = new TodoStatus("Pending");
+                TodoStatus inProgress = new TodoStatus("In Progress");
+                TodoStatus completed = new TodoStatus("Completed");
+                todoStatusRepository.save(pending);
+                todoStatusRepository.save(inProgress);
+                todoStatusRepository.save(completed);
+            }
+
+            // --- TODOS ---
+            if (todoRepository.count() == 0) {
+                User admin = userRepository.findByEmail("admin@mysite.com").orElseThrow();
+                TodoStatus pending = todoStatusRepository.findByName("Pending").orElseThrow();
+                TodoStatus inProgress = todoStatusRepository.findByName("In Progress").orElseThrow();
+                TodoStatus completed = todoStatusRepository.findByName("Completed").orElseThrow();
+
+                todoRepository.save(new Todo(
+                        "Prepare project",
+                        "Set up project structure and dependencies",
+                        admin,
+                        pending
+                ));
+                todoRepository.save(new Todo(
+                        "Write documentation",
+                        "Write initial project documentation",
+                        admin,
+                        inProgress
+                ));
+                todoRepository.save(new Todo(
+                        "Release version 1",
+                        "Deploy first version to production",
+                        admin,
+                        completed
+                ));
+            }
+        };
+    }
+}

@@ -30,6 +30,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "is_admin", nullable = false)
+    private Boolean isAdmin;
+    
     @CreationTimestamp
     private Timestamp createdAt;
 
@@ -60,6 +63,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean getIsAdmin() {
+        return isAdmin;
     }
 
     public Timestamp getCreatedAt() {
