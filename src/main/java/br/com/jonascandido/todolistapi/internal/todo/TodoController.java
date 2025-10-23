@@ -101,4 +101,17 @@ public class TodoController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTodo(@PathVariable Integer id, Principal principal) {
+        String email = principal.getName();
+        Todo todo = todoService.getTodoById(id);
+
+        if (!todo.getUser().getEmail().equals(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("message", "Forbidden"));
+        }
+
+        todoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
@@ -145,6 +146,34 @@ class TodoControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + jwtToken)
                             .content(updatedTodoJson))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.message").value("Forbidden"));
+    }
+
+    @Test
+    void shouldDeleteTodo() throws Exception {
+        TodoStatus status = todoStatusRepository.findByName("Pending").get();
+        Todo todo = new Todo("Complete API", "Complete Spring Boot API", testUser, status);
+        todoRepository.save(todo);
+
+        mockMvc.perform(delete("/todos/" + todo.getId())
+                        .header("Authorization", "Bearer " + jwtToken))
+            .andExpect(status().isNoContent());
+
+        assertFalse(todoRepository.findById(todo.getId()).isPresent());
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenDeletingOtherUsersTodo() throws Exception {
+        User otherUser = new User("Alice", "alice@example.com", "$2a$10$T70FXpYfDNlKl5.UaXbbieLbrjPxsMfzdTaJeLCS/FwdRtPf3xs3e", false);
+        userRepository.save(otherUser);
+
+        TodoStatus status = todoStatusRepository.findByName("Pending").get();
+        Todo todo = new Todo("Other's task", "Do not delete", otherUser, status);
+        todoRepository.save(todo);
+
+        mockMvc.perform(delete("/todos/" + todo.getId())
+                        .header("Authorization", "Bearer " + jwtToken))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.message").value("Forbidden"));
     }
