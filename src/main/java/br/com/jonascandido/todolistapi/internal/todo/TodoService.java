@@ -64,4 +64,10 @@ public class TodoService {
     public Page<Todo> getTodos(String email, int page, int limit) {
         return todoRepository.findByUserEmail(email, PageRequest.of(page - 1, limit));
     }
+
+    public Todo getTodoById(Integer id) {
+        return todoRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+    }
+
 }

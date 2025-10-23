@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -80,4 +81,24 @@ public class TodoController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateTodo(@PathVariable Integer id,
+                                        @RequestBody Todo updatedTodo,
+                                        Principal principal) {
+
+        String email = principal.getName();
+        Todo existingTodo = todoService.getTodoById(id);
+
+        if (!existingTodo.getUser().getEmail().equals(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("message", "Forbidden"));
+        }
+
+        Todo updated = todoService.update(id, updatedTodo);
+        TodoDTO response = TodoDTO.fromEntity(updated);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

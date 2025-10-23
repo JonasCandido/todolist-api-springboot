@@ -96,4 +96,57 @@ class TodoControllerIntegrationTest {
                .andExpect(jsonPath("$.limit").value(10))
                .andExpect(jsonPath("$.total").value(1));
     }
+
+    @Test
+    void shouldUpdateTodoSuccessfully() throws Exception {
+        TodoStatus status = todoStatusRepository.findByName("Pending").get();
+
+        Todo todo = new Todo("Complete API", "Complete Spring Boot API", testUser, status);
+        todoRepository.save(todo);
+
+        String updatedTodoJson = """
+            {
+                "title": "Complete API Updated",
+                "description": "Updated description",
+                "status": "Pending"
+            }
+        """;
+
+            mockMvc.perform(put("/todos/" + todo.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + jwtToken)
+                            .content(updatedTodoJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(todo.getId()))
+            .andExpect(jsonPath("$.title").value("Complete API Updated"))
+            .andExpect(jsonPath("$.description").value("Updated description"))
+            .andExpect(jsonPath("$.status").value("Pending"));
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenUpdatingOthersTodo() throws Exception {
+        User otherUser = new User("Other", "other@example.com", "$2a$10$T70FXpYfDNlKl5.UaXbbieLbrjPxsMfzdTaJeLCS/FwdRtPf3xs3e", true);
+        userRepository.save(otherUser);
+
+        TodoStatus status = todoStatusRepository.findByName("Pending").get();
+
+        Todo othersTodo = new Todo("Other's Todo", "Do something", otherUser, status);
+        todoRepository.save(othersTodo);
+
+        String updatedTodoJson = """
+            {
+                "title": "Hack Attempt",
+                "description": "Trying to update someone else's todo",
+                "status": "Pending"
+            }
+        """;
+
+            mockMvc.perform(put("/todos/" + othersTodo.getId())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + jwtToken)
+                            .content(updatedTodoJson))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.message").value("Forbidden"));
+    }
+
 }

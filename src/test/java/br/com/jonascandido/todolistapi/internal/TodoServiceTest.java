@@ -165,6 +165,38 @@ class TodoServiceTest {
             .findByUserEmail(eq(user.getEmail()), any(PageRequest.class));
     }
 
+    @Test
+    void testGetTodoById_Success() {
+        User user = new User("Charlie", "charlie@example.com", "123456");
+        TodoStatus pendingStatus = new TodoStatus("Pending");
+        Todo todo = new Todo("Laundry", "Do laundry", user, pendingStatus);
+    
+        setId(todo, 1);
+
+        when(todoRepository.findById(1)).thenReturn(Optional.of(todo));
+
+        Todo result = todoService.getTodoById(1);
+
+        assertEquals(1, result.getId());
+        assertEquals("Laundry", result.getTitle());
+        assertEquals(user, result.getUser());
+        assertEquals(pendingStatus, result.getStatus());
+
+        verify(todoRepository, times(1)).findById(1);
+    }
+
+    @Test
+    void testGetTodoById_NotFound() {
+        when(todoRepository.findById(99)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+                todoService.getTodoById(99);
+            });
+
+        assertEquals("Todo not found", exception.getMessage());
+        verify(todoRepository, times(1)).findById(99);
+    }
+
     
     private void setId(Todo todo, Integer id) {
         Field idField = ReflectionUtils.findField(Todo.class, "id");
