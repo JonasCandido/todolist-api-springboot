@@ -2,6 +2,7 @@ package br.com.jonascandido.todolistapi.internal.todo;
 
 import br.com.jonascandido.todolistapi.internal.user.*;
 import br.com.jonascandido.todolistapi.internal.todostatus.*;
+import br.com.jonascandido.todolistapi.internal.todo.dto.*;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -21,15 +22,25 @@ public class TodoController {
     }
 
     @GetMapping("/todos")
-    public ResponseEntity<Page<Todo>> getTodos(@RequestParam(defaultValue = "1") int page,
-                                               @RequestParam(defaultValue = "10") int limit,
-                                               Principal principal) { 
-        
+    public ResponseEntity<TodoPageResponse> getTodos(
+                                                     @RequestParam(defaultValue = "1") int page,
+                                                     @RequestParam(defaultValue = "10") int limit,
+                                                     Principal principal) {
+
         String email = principal.getName();
-        
-        Page<Todo> todos = todoService.getTodos(email, page, limit);
-        
-        return ResponseEntity.ok(todos);
+
+        var todosPage = todoService.getTodos(email, page, limit);
+
+        var response = new TodoPageResponse(
+                                            todosPage.getContent().stream()
+                                            .map(TodoDTO::fromEntity)
+                                            .toList(),
+                                            page,
+                                            limit,
+                                            todosPage.getTotalElements()
+                                            );
+
+        return ResponseEntity.ok(response);
     }
 }
  
