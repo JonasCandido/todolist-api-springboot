@@ -52,7 +52,7 @@ class UserServiceTest {
             userService.addUser(user);
         });
 
-        assertEquals("Email already exists", exception.getMessage());
+        assertEquals("Failed to create user", exception.getMessage());
         verify(userRepository).existsByEmail(user.getEmail());
         verify(userRepository, never()).save(any());
     }

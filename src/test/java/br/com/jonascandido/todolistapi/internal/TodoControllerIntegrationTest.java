@@ -3,6 +3,7 @@ package br.com.jonascandido.todolistapi.internal;
 import br.com.jonascandido.todolistapi.internal.todo.*;
 import br.com.jonascandido.todolistapi.internal.user.*;
 import br.com.jonascandido.todolistapi.internal.todostatus.*;
+import br.com.jonascandido.todolistapi.config.JwtUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,10 +35,26 @@ class TodoControllerIntegrationTest {
 
     @Autowired
     private TodoStatusRepository todoStatusRepository;
-    
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private User testUser;
+    private String jwtToken;
+
     @BeforeEach
-    void cleanDatabase() {
+    void setup() {
         todoRepository.deleteAll();
+        userRepository.deleteAll();
+        todoStatusRepository.deleteAll();
+
+        testUser = new User("Jonas", "jonas@example.com", "$2a$10$T70FXpYfDNlKl5.UaXbbieLbrjPxsMfzdTaJeLCS/FwdRtPf3xs3e", true);
+        userRepository.save(testUser);
+
+        jwtToken = jwtUtil.generateToken(testUser.getEmail());
+
+        TodoStatus pendingStatus = new TodoStatus("Pending");
+        todoStatusRepository.save(pendingStatus);
     }
 
     @Test
@@ -46,20 +63,37 @@ class TodoControllerIntegrationTest {
         {
           "title": "Complete API",
           "description": "Complete Spring Boot API",
-          "status": {
-              "name": Pending
-          }
+          "status": "Pending"
         }
         """;
 
         mockMvc.perform(post("/todos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + jwtToken)
                         .content(todoJson))
                .andExpect(status().isCreated())
                .andExpect(jsonPath("$.id").exists())
                .andExpect(jsonPath("$.title").value("Complete API"))
                .andExpect(jsonPath("$.description").value("Complete Spring Boot API"))
-               .andExpect(jsonPath("$.status.name").value("Pending"));
-               // Expect user/principal ??
+               .andExpect(jsonPath("$.status").value("Pending"));
+    }
+
+    @Test
+    void shouldGetTodos() throws Exception {
+        TodoStatus status = todoStatusRepository.findByName("Pending").get();
+
+        Todo todo = new Todo("Complete API", "Complete Spring Boot API", testUser, status);
+        todoRepository.save(todo);
+
+        mockMvc.perform(get("/todos?page=1&limit=10")
+                        .header("Authorization", "Bearer " + jwtToken))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.data[0].id").value(todo.getId()))
+               .andExpect(jsonPath("$.data[0].title").value("Complete API"))
+               .andExpect(jsonPath("$.data[0].description").value("Complete Spring Boot API"))
+               .andExpect(jsonPath("$.data[0].status").value("Pending"))
+               .andExpect(jsonPath("$.page").value(1))
+               .andExpect(jsonPath("$.limit").value(10))
+               .andExpect(jsonPath("$.total").value(1));
     }
 }

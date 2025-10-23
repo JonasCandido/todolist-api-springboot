@@ -1,6 +1,8 @@
 package br.com.jonascandido.todolistapi.internal;
 
 import br.com.jonascandido.todolistapi.internal.user.*;
+import br.com.jonascandido.todolistapi.internal.todo.*;
+import br.com.jonascandido.todolistapi.internal.todostatus.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,9 +29,17 @@ class UserControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @Autowired
+    private TodoStatusRepository todoStatusRepository;
+
     @BeforeEach
     void cleanDatabase() {
+        todoRepository.deleteAll();
         userRepository.deleteAll();
+        todoStatusRepository.deleteAll();
     }
 
     @Test
@@ -39,9 +49,7 @@ class UserControllerIntegrationTest {
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(user)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.id").exists())
-               .andExpect(jsonPath("$.name").value("Renan"))
-               .andExpect(jsonPath("$.email").value("renan@example.com"));
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.token").exists());
     }
 }

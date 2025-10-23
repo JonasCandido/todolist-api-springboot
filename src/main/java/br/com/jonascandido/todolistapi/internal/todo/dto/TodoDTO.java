@@ -5,9 +5,10 @@ import br.com.jonascandido.todolistapi.internal.todo.*;
 public record TodoDTO(
         Integer id,
         String title,
-        String description
+        String description,
+        String status
 ) {
     public static TodoDTO fromEntity(Todo todo) {
-        return new TodoDTO(todo.getId(), todo.getTitle(), todo.getDescription());
+        return new TodoDTO(todo.getId(), todo.getTitle(), todo.getDescription(), todo.getStatus().getName());
     }
 }
