@@ -43,6 +43,5 @@ class UserControllerIntegrationTest {
                .andExpect(jsonPath("$.id").exists())
                .andExpect(jsonPath("$.name").value("Renan"))
                .andExpect(jsonPath("$.email").value("renan@example.com"));
-               // Add password check ?
     }
 }

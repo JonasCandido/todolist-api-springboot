@@ -61,7 +61,7 @@ public class TodoService {
         todoRepository.delete(todo);
     }
 
-    public Page<Todo> getTodos(int page, int limit) {
-        return todoRepository.findAll(PageRequest.of(page - 1, limit));
+    public Page<Todo> getTodos(String email, int page, int limit) {
+        return todoRepository.findByUserEmail(email, PageRequest.of(page - 1, limit));
     }
 }
