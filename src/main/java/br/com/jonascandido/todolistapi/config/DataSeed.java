@@ -6,11 +6,12 @@ import br.com.jonascandido.todolistapi.internal.todostatus.TodoStatus;
 import br.com.jonascandido.todolistapi.internal.todostatus.TodoStatusRepository;
 import br.com.jonascandido.todolistapi.internal.user.User;
 import br.com.jonascandido.todolistapi.internal.user.UserRepository;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Profile("dev")
@@ -23,6 +24,10 @@ public class DataSeed {
                            PasswordEncoder passwordEncoder) {
         return args -> {
 
+            todoRepository.deleteAll();
+            todoStatusRepository.deleteAll();
+            userRepository.deleteAll();
+            
             // --- USERS ---
             if (userRepository.count() == 0) {
                 User admin = new User(
@@ -69,6 +74,21 @@ public class DataSeed {
                         admin,
                         completed
                 ));
+
+                // Add more todos for testing purposes 
+                for (int i = 1; i <= 30; i++) {
+                    TodoStatus status;
+                    if (i % 3 == 0) status = completed;
+                    else if (i % 3 == 1) status = pending;
+                    else status = inProgress;
+
+                    todoRepository.save(new Todo(
+                            "Todo #" + i,
+                            "Description for todo #" + i,
+                            admin,
+                            status
+                    ));
+                }
             }
         };
     }
