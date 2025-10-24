@@ -1,6 +1,8 @@
 # Todo List API
 
-## Technologies used in the project
+## Technologies used in the project and requirements
+- Java 17(OpenJDK 17.0.16 or higher)
+- Maven 3.8.1 or higher
 - Spring Boot
 - Postgres(development)
 - H2(tests)
@@ -29,18 +31,22 @@
   
 - Store the token that the application will throw to be used in anothers requests.
 
-## URL: 
+### URL: 
 - The token must be sent at Authorization: Bearer header.
 - POST -> /todos
 - PUT and DELETE -> /todos/{id}
 
-## BODY for POST and PUT operations example:
+### BODY for POST and PUT operations example:
 {
         "title": "Buy groceries completed",
         "description": "Buy milk, eggs, bread, and cheese",
         "status": { "name": "Completed" }
 }
   
-
+## How to run the tests
+- In a terminal run:
+```
+mvn test
+```
 
   
