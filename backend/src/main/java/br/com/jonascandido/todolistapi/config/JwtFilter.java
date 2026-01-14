@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (header == null || !header.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: Missing or invalid token");
+            response.getWriter().write("{\"Unauthorized\":\"Missing or invalid token\"}");
             return;
         }
 
@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: Invalid token");
+            response.getWriter().write("{\"Unauthorized\":\"Invalid token\"}");
             return;
         }
 

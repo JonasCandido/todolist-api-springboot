@@ -1,19 +1,20 @@
 # Todo List API
 
-## Technologies used in the project and requirements
-- Java 17(OpenJDK 17.0.16 or higher)
-- Maven 3.8.1 or higher
+## Technologies used in the project
+- Java 17
 - Spring Boot
-- Postgres(development)
+- Postgres
 - H2(tests)
+- Docker
 
 ## How to run the application
 - Configure the properties files. (Examples in examples folder)
 - Run:
   
   ```
-  mvn spring-boot:run -Dspring-boot.run.profiles=dev
+  docker-compose up --build
   ```
+
 - In another terminal tab(here I'm using curl to make the requests examples):
   ```
   curl -X POST http://localhost:8080/register \
@@ -33,20 +34,16 @@
 
 ### URL: 
 - The token must be sent at Authorization: Bearer header.
+- GET /todos?page=(page_number)&limit=(limit_number)
 - POST -> /todos
 - PUT and DELETE -> /todos/{id}
 
 ### BODY for POST and PUT operations example:
+Available status: Pending, In Progress, Completed
 {
         "title": "Buy groceries completed",
         "description": "Buy milk, eggs, bread, and cheese",
         "status": { "name": "Completed" }
 }
-  
-## How to run the tests
-- In a terminal run:
-```
-mvn test
-```
 
   

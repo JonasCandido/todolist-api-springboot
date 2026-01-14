@@ -91,8 +91,8 @@ public class TodoController {
         Todo existingTodo = todoService.getTodoById(id);
 
         if (!existingTodo.getUser().getEmail().equals(email)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Forbidden"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Todo not found"));
         }
 
         Todo updated = todoService.update(id, updatedTodo);
@@ -107,8 +107,8 @@ public class TodoController {
         Todo todo = todoService.getTodoById(id);
 
         if (!todo.getUser().getEmail().equals(email)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("message", "Forbidden"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Todo not found"));
         }
 
         todoService.delete(id);

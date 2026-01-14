@@ -125,7 +125,7 @@ class TodoControllerIntegrationTest {
     }
 
     @Test
-    void shouldReturnForbiddenWhenUpdatingOthersTodo() throws Exception {
+    void shouldReturnNotFoundWhenUpdatingOthersTodo() throws Exception {
         User otherUser = new User("Other", "other@example.com", "$2a$10$T70FXpYfDNlKl5.UaXbbieLbrjPxsMfzdTaJeLCS/FwdRtPf3xs3e", true);
         userRepository.save(otherUser);
 
@@ -146,8 +146,8 @@ class TodoControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + jwtToken)
                             .content(updatedTodoJson))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value("Forbidden"));
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("Todo not found"));
     }
 
     @Test
@@ -164,7 +164,7 @@ class TodoControllerIntegrationTest {
     }
 
     @Test
-    void shouldReturnForbiddenWhenDeletingOtherUsersTodo() throws Exception {
+    void shouldReturnNotFoundWhenDeletingOtherUsersTodo() throws Exception {
         User otherUser = new User("Alice", "alice@example.com", "$2a$10$T70FXpYfDNlKl5.UaXbbieLbrjPxsMfzdTaJeLCS/FwdRtPf3xs3e", false);
         userRepository.save(otherUser);
 
@@ -174,8 +174,8 @@ class TodoControllerIntegrationTest {
 
         mockMvc.perform(delete("/todos/" + todo.getId())
                         .header("Authorization", "Bearer " + jwtToken))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value("Forbidden"));
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("Todo not found"));
     }
 
 }

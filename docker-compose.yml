@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:15.5
+    environment:
+      POSTGRES_DB: todosdb
+      POSTGRES_USER: todos
+      POSTGRES_PASSWORD: todos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api-tests:
+    build: ./backend
+    command: mvn test
+
+  api:
+    build: ./backend
+    depends_on:
+      - postgres
+    environment:
+      SPRING_APPLICATION_NAME: todolist-api
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/todosdb
+      SPRING_DATASOURCE_USERNAME: todos
+      SPRING_DATASOURCE_PASSWORD: todos
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
