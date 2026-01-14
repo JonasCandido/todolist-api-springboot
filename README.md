@@ -8,7 +8,14 @@
 - Docker
 
 ## How to run the application
-- Configure the properties files. (Examples in examples folder)
+The project uses a .env file to store your JWT key. There is a .env.example file in the repository:<br>
+```
+cp .env.example .env
+```
+And set your JWT 256 bits key.<br>
+
+After that:
+
 - Run:
   
   ```
